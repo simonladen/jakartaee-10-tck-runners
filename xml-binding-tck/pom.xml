@@ -55,10 +55,10 @@
     <name>TCK: Activation</name>
 
     <properties>
-        <ant.home>${project.build.directory}${file.separator}apache-ant-${ant.version}</ant.home>
+        <ant.home>${project.build.directory}/apache-ant-${ant.version}</ant.home>
         <ant.zip.url>https://archive.apache.org/dist/ant/binaries/apache-ant-${ant.version}-bin.zip</ant.zip.url>
-        <ant.executable>${ant.home}${file.separator}bin${file.separator}ant</ant.executable>
-        <tck.home>${project.build.directory}${file.separator}xml-binding-tck</tck.home>
+        <ant.executable>${ant.home}/bin/ant</ant.executable>
+        <tck.home>${project.build.directory}/xml-binding-tck</tck.home>
         <os.folder>linux</os.folder>
         <os.extension>sh</os.extension>
         <os.script.command>"/bin/sh"</os.script.command>
@@ -70,6 +70,12 @@
             <artifactId>jakarta-xml-binding-tck</artifactId>
             <version>${project.version}</version>
             <type>zip</type>
+            <scope>test</scope>
+        </dependency>        
+        <dependency>
+            <groupId>javatest</groupId>
+            <artifactId>javatest</artifactId>
+            <version>5.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -182,13 +188,6 @@
                                 <tck-setting key="jck.env.jaxb.testExecute.otherEnvVars" value="JAVA_HOME\=${java.home} JAXB_HOME\=${payara.home}/glassfish/modules"/>
                                 <tck-setting key="jck.env.jaxb.schemagen.run.jxcCmd" value="${os.script.command} ${tck.home}/${os.folder}/bin/schemagen.${os.extension}"/>
                                 <tck-setting key="jck.env.jaxb.xsd_compiler.testCompile.xjcCmd" value="${os.script.command} ${tck.home}/${os.folder}/bin/xjc.${os.extension}"/>
-                                
-
-                                <!-- <replace file="${tck.home}/build.xml">
-                                    <replacetoken><![CDATA[<sysproperty key="testDebug" value="${tests.debug}"/>]]></replacetoken>
-                                    <replacevalue><![CDATA[<sysproperty key="testDebug" value="${tests.debug}"/>
-                                <jvmarg value="-Djavatest.security.noSecurityManager=true"/>]]></replacevalue>
-                                </replace> -->
                             </target>
                         </configuration>
                     </execution>
@@ -208,11 +207,11 @@
                                         <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="maven.plugin.classpath" />
 
                                         <echo level="info" message="Start running all tests" />
-                                        <exec executable="${ant.executable}" dir="${tck.home}" resultproperty="testResult">
+                                        <exec executable="${ant.executable}" dir="${tck.home}/tests" resultproperty="testResult">
                                             <arg value="runclient" />
                                             <arg value="-DfailOnError=false" />
                                             <env key="JAVA_HOME" value="${java.home}"/>
-                                            <env key="JAXB_HOME" value="${payara.home}${file.separator}glassfish${file.separator}modules" />
+                                            <env key="JAXB_HOME" value="${payara.home}/glassfish/modules" />
                                             <env key="TS_HOME" value="${tck.home}" />
                                         </exec>
 
@@ -222,7 +221,7 @@
                                             </not>
                                             <then>
                                                 <echo message="Running tests failed." />
-                                                <loadfile property="contents" srcFile="${payara.home}${file.separator}glassfish${file.separator}domains${file.separator}domain1${file.separator}logs${file.separator}server.log" />
+                                                <loadfile property="contents" srcFile="${payara.home}/glassfish/domains/domain1/logs/server.log" />
                                                 <echo message="${contents}" />
                                             </then>
                                         </if>
@@ -240,29 +239,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <!--<plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>integration-test</phase>
-                        <goals>
-                                <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>${java.home}/bin/java</executable>
-                            <arguments>
-                                <argument>-jar ${tck.home}\lib\javatest.jar</argument>
-                                <argument>-batch</argument>
-                                <argument>-testsuite ${tck.home}</argument>
-                                <argument>-open ${tck.home}\lib\javasoft-multiJVM.jti</argument>
-                                <argument>-workdir -create ${tck.home}\work</argument>
-                                <argument>-runtests</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin> -->
         </plugins>
     </build>
 
@@ -278,7 +254,8 @@
                 <os.folder>win32</os.folder>
                 <os.extension>bat</os.extension>
                 <os.script.command></os.script.command>
-                <ant.executable>${ant.home}${file.separator}bin${file.separator}ant.cmd</ant.executable>
+                <ant.executable>${ant.home}/bin/ant.cmd</ant.executable>
+                <file.separator>\</file.separator>
             </properties>
         </profile>
     </profiles>

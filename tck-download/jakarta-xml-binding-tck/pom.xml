@@ -34,6 +34,8 @@
     <properties>
         <tck.test.xml-binding.file>jakarta-xml-binding-tck-${jakarta.tck.xml-binding.version}.zip</tck.test.xml-binding.file>
         <tck.test.xml-binding.url>https://download.eclipse.org/jakartaee/xml-binding/4.0/${tck.test.xml-binding.file}</tck.test.xml-binding.url>
+        <javatest.source.url>https://github.com/openjdk/jtharness/archive/refs/tags/jt5.0.zip</javatest.source.url>
+        <project.build.javatestSources>${project.build.directory}${file.separator}javatest-sources</project.build.javatestSources>
     </properties>
 
     <build>
@@ -52,11 +54,57 @@
                             <url>${tck.test.xml-binding.url}</url>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>download-javatest-src</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>wget</goal>
+                        </goals>
+                        <configuration>
+                            <url>${javatest.source.url}</url>
+                            <outputDirectory>${project.build.javatestSources}</outputDirectory>
+                            <unpack>true</unpack>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>package-sources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>javatest</finalName>
+                            <descriptors>
+                                <descriptor>assembly${file.separator}sources.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-install-plugin</artifactId>
                 <executions>
+                    <execution>
+                        <id>install-javatest-as-5</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>install-file</goal>
+                        </goals>
+                        <configuration>
+                            <file>tck-download${file.separator}javatest${file.separator}javatest.jar</file>
+                            <sources>${project.build.directory}${file.separator}javatest-sources.jar</sources>
+                            <groupId>javatest</groupId>
+                            <artifactId>javatest</artifactId>
+                            <version>5.0</version>
+                            <packaging>jar</packaging>
+                            <generatePom>true</generatePom>
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>install-xml-binding-tck</id>
                         <phase>process-resources</phase>
