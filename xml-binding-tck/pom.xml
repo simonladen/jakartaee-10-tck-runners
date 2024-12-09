@@ -207,7 +207,7 @@
                                         <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="maven.plugin.classpath" />
 
                                         <echo level="info" message="Start running all tests" />
-                                        <exec executable="${ant.executable}" dir="${tck.home}/tests" resultproperty="testResult">
+                                        <exec executable="${ant.executable}" dir="${tck.home}" resultproperty="testResult">
                                             <arg value="runclient" />
                                             <arg value="-DfailOnError=false" />
                                             <env key="JAVA_HOME" value="${java.home}"/>

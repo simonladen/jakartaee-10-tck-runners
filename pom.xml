@@ -110,6 +110,7 @@
         <jakarta.tck.batch.version>2.1.5</jakarta.tck.batch.version>
         <jakarta.tck.core-profile.version>11.0.0</jakarta.tck.core-profile.version>
         <jakarta.tck.inject.version>2.0.2</jakarta.tck.inject.version>
+        <jakarta.tck.xml-binding.version>4.0.2</jakarta.tck.xml-binding.version>
         
         <!-- The profile to run - acceptable parameters are 'full', 'web', and 'core' -->
         <jakarta.tck.platform>full</jakarta.tck.platform>
@@ -152,6 +153,7 @@
         <module>expression-language-tck</module>
         <module>bean-validation-tck</module>
         <module>persistence-tck</module>
+        <module>xml-binding-tck</module>
     </modules>
 
     <dependencyManagement>
