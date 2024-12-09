@@ -61,10 +61,11 @@
         <tck.home>${project.build.directory}${file.separator}mail-tck</tck.home>
         
         <javamail.username>user01%40james.local</javamail.username>
+        <smtp.username>user01@james.local</smtp.username>
         <javamail.password>1234</javamail.password>
         <javamail.server>localhost</javamail.server>
         <javamail.smtp.port>1025</javamail.smtp.port>
-        <javamail.imap.port>1143</javamail.imap.port>
+        <javamail.imap.port>1143</javamail.imap.port>        
     </properties>
 
     <dependencies>
@@ -100,7 +101,7 @@
                 </configuration>
             </plugin>
 
-            <!-- Unpack Payara and TCK -->
+            <!-- Unpack TCK -->
             <plugin>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <configuration>
@@ -109,7 +110,7 @@
                 <executions>
                     <execution>
                         <id>unpack-tck</id>
-                        <phase>pre-integration-test</phase>
+                        <phase>generate-test-resources</phase>
                         <goals>
                             <goal>unpack-dependencies</goal>
                         </goals>
@@ -173,12 +174,17 @@
                                 <tck-setting key="ANT_HOME" value="${ant.home}"/>
                                 <tck-setting key="JAVA_HOME" value="${java.home}"/>
                                 <tck-setting key="JARPATH" value="${payara.home}/glassfish/modules"/>
-                                <tck-setting key="JAVAMAIL_SERVER" value="${javamail.server}"/>
-                                <tck-setting key="JAVAMAIL_USERNAME" value="${javamail.username}"/>
+                                <tck-setting key="JAVAMAIL_SERVER" value="${javamail.server} -pn ${javamail.imap.port}"/>
+                                <tck-setting key="JAVAMAIL_PROTOCOL" value="imap"/>
+                                <tck-setting key="JAVAMAIL_TRANSPORT_PROTOCOL" value="smtp"/>
+                                <tck-setting key="JAVAMAIL_TRANSPORT_SERVER" value="${javamail.server} -tpn ${javamail.smtp.port}"/>
+                                <tck-setting key="JAVAMAIL_USERNAME" value="${smtp.username}"/>
                                 <tck-setting key="JAVAMAIL_PASSWORD" value="${javamail.password}"/>
                                 <tck-setting key="JAVAMAIL_ROOT_PATH" value="/"/>
-                                <tck-setting key="SMTP_USERNAME" value="${javamail.username}"/>
+                                <tck-setting key="SMTP_USERNAME" value="${smtp.username}"/>
                                 <tck-setting key="SMTP_DOMAIN" value="${javamail.server}"/>
+                                <tck-setting key="SMTP_FROM" value="${smtp.username}"/>
+                                <tck-setting key="SMTP_TO" value="${smtp.username}"/>
                                 
                                 <replace file="${tck.home}/build.xml">
                                     <replacetoken><![CDATA[<sysproperty key="testDebug" value="${tests.debug}"/>]]></replacetoken>
@@ -258,7 +264,7 @@
                                     <shell>/bin/bash /root/startup.sh</shell>
                                 </entryPoint>
                                 <wait>
-                                    <time>30000</time>
+                                    <time>60000</time>
                                     <exec>
                                         <postStart>/bin/bash /root/create_users.sh</postStart>
                                     </exec>
@@ -291,20 +297,17 @@
                 <executions>
                   <execution>
                     <id>populate mail server</id>
-                    <phase>generate-test-resources</phase>
+                    <phase>pre-integration-test</phase>
                     <goals>
                         <goal>exec</goal>
                     </goals>
                   </execution>
                 </executions>
                 <configuration>
-                    <mainClass>fpopulate</mainClass>
-                    <includeProjectDependencies>false</includeProjectDependencies>
-                    <includePluginDependencies>true</includePluginDependencies>
                     <executable>java</executable>
                     <arguments>
                         <argument>-classpath</argument>
-                        <argument>${payara.home}/glassfish/modules/jakarta.mail-api.jar;${payara.home}/glassfish/modules/jakarta.activation-api.jar;${payara.home}/glassfish/modules/angus-mail.jar;${payara.home}/glassfish/modules/angus-activation.jar</argument>
+                        <argument>${payara.home}/glassfish/modules/jakarta.mail-api.jar:${payara.home}/glassfish/modules/jakarta.activation-api.jar:${payara.home}/glassfish/modules/angus-mail.jar:${payara.home}/glassfish/modules/angus-activation.jar</argument>
                         <argument>fpopulate.java</argument>
                         <argument>-s</argument>
                         <argument>test1</argument>
@@ -313,13 +316,6 @@
                     </arguments>
                     <workingDirectory>${tck.home}/tests/mailboxes</workingDirectory>
                 </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>jakarta.mail</groupId>
-                        <artifactId>jakarta.mail-api</artifactId>
-                        <version>2.1.3</version>
-                    </dependency>
-                </dependencies>
             </plugin>
         </plugins>
     </build>
